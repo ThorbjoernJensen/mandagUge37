@@ -90,4 +90,12 @@ public class Employee
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    public void addCustomer(Customer customer){
+        if(customer != null){
+            this.customers.add(customer);
+//            man skal ikke sætte den fra den anden side, for det gør JPA selv
+        }
+
+    }
 }

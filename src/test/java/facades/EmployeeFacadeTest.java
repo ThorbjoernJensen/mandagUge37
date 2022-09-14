@@ -79,6 +79,11 @@ class EmployeeFacadeTest {
 
     @Test
     void createEmployee() {
+        Employee employee = facade.createEmployee("Peter", 30000);
+        List<Employee> actual = facade.getAllEmployees();
+        assertEquals(4, actual.size());
+
+        assertThat(actual, containsInAnyOrder(e1,e2,e3, employee));
 
 
     }

@@ -1,6 +1,7 @@
 package facades;
 
 import dtos.RenameMeDTO;
+import entities.Customer;
 import entities.Employee;
 import entities.RenameMe;
 
@@ -65,6 +66,8 @@ public class EmployeeFacade {
             TypedQuery<Employee> query = em.createQuery(
                     "Select e From Employee e where " +
                             "e.salary = (Select max(e.salary) from Employee e)" , Employee.class);
+//            "Select e From Employee e where " +
+//                            "e.salary >= (Select e.salary from Employee e)" , Employee.class);
             return query.getResultList();
         } finally {
             em.close();
@@ -86,7 +89,7 @@ public class EmployeeFacade {
         EntityManager em = getEntityManager();
         try {
             if (getEmployeesByName(name).size() > 0) {
-                throw new WebApplicationException("Employee with name: " + name + " already exists.");
+                throw new WebApplicationException("Employee with name: " + name + " exists already.");
             }
             Employee newEmployee = new Employee(name, salery);
             em.getTransaction().begin();
@@ -96,6 +99,25 @@ public class EmployeeFacade {
 
         } finally {
             em.close();
+        }
+    }
+    public Employee addCustomer(int employeeId, String customerName){
+        EntityManager em = getEntityManager();
+
+        try{
+        Employee employee = em.find(Employee.class, employeeId);
+        if(employee == null)
+        {throw new WebApplicationException("employee doesnt exits!");}
+        em.getTransaction().begin();
+        Customer customer = new Customer(customerName);
+        employee.addCustomer(customer);
+        em.persist(customer);
+//        merge?
+        em.getTransaction().commit();
+        return employee;
+        } finally {
+
+        em.close();
         }
     }
 
