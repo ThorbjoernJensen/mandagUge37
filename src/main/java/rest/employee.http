@@ -1,0 +1,15 @@
+### GET all employees
+GET http://localhost:8080/restdemo/api/employee/all
+accept: application/json
+
+### GET specific employee by id
+GET http://localhost:8080/restdemo/api/employee/2
+accept: application/json
+
+### GET employee with highest salery
+GET http://localhost:8080/restdemo/api/employee/highestpaid
+accept: application/json
+
+### GET specific employee by name
+GET http://localhost:8080/restdemo/api/employee/name/John
+accept: application/json

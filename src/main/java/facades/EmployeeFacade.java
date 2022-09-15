@@ -1,6 +1,7 @@
 package facades;
 
-import dtos.RenameMeDTO;
+import entities.dtos.EmployeeDTO;
+import entities.dtos.RenameMeDTO;
 import entities.Customer;
 import entities.Employee;
 import entities.RenameMe;
@@ -12,7 +13,7 @@ import javax.persistence.TypedQuery;
 import javax.ws.rs.WebApplicationException;
 
 //import errorhandling.RenameMeNotFoundException;
-import utils.EMF_Creator;
+
 
 public class EmployeeFacade {
 
@@ -36,50 +37,61 @@ public class EmployeeFacade {
         return emf.createEntityManager();
     }
 
-    public Employee getEmployeeById(int id) {
+    public EmployeeDTO getEmployeeById(int id) {
         EntityManager em = getEntityManager();
         try {
+            Employee e = em.find(Employee.class, id);
 
-            return em.find(Employee.class, id);
+
+            if (e != null){
+
+
+                return new EmployeeDTO(e);
+            }
+            else {
+                throw new WebApplicationException("employee doesnt exits!");
+            }
+
         } finally {
             em.close();
         }
 
     }
 
-    public List<Employee> getEmployeesByName(String name) {
+    public List<EmployeeDTO> getEmployeesByName(String name) {
 
         EntityManager em = getEntityManager();
         try {
             TypedQuery<Employee> query = em.createQuery("Select e From Employee e Where e.name = :name", Employee.class);
             query.setParameter("name", name);
-            return query.getResultList();
+
+            return EmployeeDTO.getDTOList(query.getResultList());
         } finally {
             em.close();
         }
     }
 
-    public List<Employee> getEmployeesWithHighestSalery() {
+    public List<EmployeeDTO> getEmployeesWithHighestSalery() {
 
         EntityManager em = getEntityManager();
         try {
             TypedQuery<Employee> query = em.createQuery(
                     "Select e From Employee e where " +
-                            "e.salary = (Select max(e.salary) from Employee e)" , Employee.class);
+                            "e.salary = (Select max(e.salary) from Employee e)", Employee.class);
 //            "Select e From Employee e where " +
 //                            "e.salary >= (Select e.salary from Employee e)" , Employee.class);
-            return query.getResultList();
+            return EmployeeDTO.getDTOList(query.getResultList());
         } finally {
             em.close();
         }
     }
 
-    public List<Employee> getAllEmployees() {
+    public List<EmployeeDTO> getAllEmployees() {
 
         EntityManager em = getEntityManager();
         try {
             TypedQuery<Employee> query = em.createQuery("Select e From Employee e", Employee.class);
-            return query.getResultList();
+            return EmployeeDTO.getDTOList(query.getResultList());
         } finally {
             em.close();
         }
@@ -101,64 +113,66 @@ public class EmployeeFacade {
             em.close();
         }
     }
-    public Employee addCustomer(int employeeId, String customerName){
+
+    public Employee addCustomer(int employeeId, String customerName) {
         EntityManager em = getEntityManager();
 
-        try{
-        Employee employee = em.find(Employee.class, employeeId);
-        if(employee == null)
-        {throw new WebApplicationException("employee doesnt exits!");}
-        em.getTransaction().begin();
-        Customer customer = new Customer(customerName);
-        employee.addCustomer(customer);
-        em.persist(customer);
-//        merge?
-        em.getTransaction().commit();
-        return employee;
-        } finally {
-
-        em.close();
-        }
-    }
-
-
-    public RenameMeDTO create(RenameMeDTO rm) {
-        RenameMe rme = new RenameMe(rm.getDummyStr1(), rm.getDummyStr2());
-        EntityManager em = getEntityManager();
         try {
+            Employee employee = em.find(Employee.class, employeeId);
+            if (employee == null) {
+                throw new WebApplicationException("employee doesnt exits!");
+            }
             em.getTransaction().begin();
-            em.persist(rme);
+            Customer customer = new Customer(customerName);
+            employee.addCustomer(customer);
+            em.persist(customer);
+//        merge?
             em.getTransaction().commit();
+            return employee;
         } finally {
-            em.close();
-        }
-        return new RenameMeDTO(rme);
-    }
 
-    public RenameMeDTO getById(long id) { //throws RenameMeNotFoundException {
-        EntityManager em = emf.createEntityManager();
-        RenameMe rm = em.find(RenameMe.class, id);
-//        if (rm == null)
-//            throw new RenameMeNotFoundException("The RenameMe entity with ID: "+id+" Was not found");
-        return new RenameMeDTO(rm);
-    }
-
-    //TODO Remove/Change this before use
-    public long getRenameMeCount() {
-        EntityManager em = getEntityManager();
-        try {
-            long renameMeCount = (long) em.createQuery("SELECT COUNT(r) FROM RenameMe r").getSingleResult();
-            return renameMeCount;
-        } finally {
             em.close();
         }
     }
 
-    public List<RenameMeDTO> getAll() {
-        EntityManager em = emf.createEntityManager();
-        TypedQuery<RenameMe> query = em.createQuery("SELECT r FROM RenameMe r", RenameMe.class);
-        List<RenameMe> rms = query.getResultList();
-        return RenameMeDTO.getDtos(rms);
-    }
+
+//    public RenameMeDTO create(RenameMeDTO rm) {
+//        RenameMe rme = new RenameMe(rm.getDummyStr1(), rm.getDummyStr2());
+//        EntityManager em = getEntityManager();
+//        try {
+//            em.getTransaction().begin();
+//            em.persist(rme);
+//            em.getTransaction().commit();
+//        } finally {
+//            em.close();
+//        }
+//        return new RenameMeDTO(rme);
+//    }
+//
+//    public RenameMeDTO getById(long id) { //throws RenameMeNotFoundException {
+//        EntityManager em = emf.createEntityManager();
+//        RenameMe rm = em.find(RenameMe.class, id);
+////        if (rm == null)
+////            throw new RenameMeNotFoundException("The RenameMe entity with ID: "+id+" Was not found");
+//        return new RenameMeDTO(rm);
+//    }
+//
+//    //TODO Remove/Change this before use
+//    public long getRenameMeCount() {
+//        EntityManager em = getEntityManager();
+//        try {
+//            long renameMeCount = (long) em.createQuery("SELECT COUNT(r) FROM RenameMe r").getSingleResult();
+//            return renameMeCount;
+//        } finally {
+//            em.close();
+//        }
+//    }
+//
+//    public List<RenameMeDTO> getAll() {
+//        EntityManager em = emf.createEntityManager();
+//        TypedQuery<RenameMe> query = em.createQuery("SELECT r FROM RenameMe r", RenameMe.class);
+//        List<RenameMe> rms = query.getResultList();
+//        return RenameMeDTO.getDtos(rms);
+//    }
 
 }
