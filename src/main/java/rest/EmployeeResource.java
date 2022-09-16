@@ -3,6 +3,7 @@ package rest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import entities.Employee;
+import entities.dtos.CustomerDTO;
 import entities.dtos.EmployeeDTO;
 import facades.EmployeeFacade;
 import facades.FacadeExample;
@@ -64,5 +65,23 @@ public class EmployeeResource {
         return GSON.toJson(employeeDTOs);
 
     }
+
+    @GET
+    @Path("/showcustomersbyemployee/{id}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public String getCustomersByEmployeeID(@PathParam("id") int id) {
+        List <CustomerDTO> customerDTOs = FACADE.getCustomersByEmployeeId(id);
+        return GSON.toJson(customerDTOs);
+
+    }
+    @GET
+    @Path("/showemployeesbycustomer/{id}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public String getEmployeesByCustomerId(@PathParam("id") int id) {
+        List <EmployeeDTO> employeeDTOs = FACADE.getEmployeeByCustomerId(id);
+        return GSON.toJson(employeeDTOs);
+
+    }
+
 
 }

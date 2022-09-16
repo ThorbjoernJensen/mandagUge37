@@ -4,6 +4,8 @@ import entities.Customer;
 
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -11,7 +13,7 @@ import java.util.Objects;
  */
 public class CustomerDTO implements Serializable {
     private final Integer id;
-//    @Size(max = 45)
+    //    @Size(max = 45)
     private final String name;
 
     public CustomerDTO(Customer customer) {
@@ -46,5 +48,11 @@ public class CustomerDTO implements Serializable {
         return getClass().getSimpleName() + "(" +
                 "id = " + id + ", " +
                 "name = " + name + ")";
+    }
+
+    public static List<CustomerDTO> getCustomerDTOs(List<Customer> customerList) {
+        List<CustomerDTO> customerDTOs = new ArrayList<>();
+        customerList.forEach(customer -> customerDTOs.add(new CustomerDTO(customer)));
+        return customerDTOs;
     }
 }

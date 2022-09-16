@@ -1,5 +1,6 @@
 package facades;
 
+import entities.dtos.CustomerDTO;
 import entities.dtos.EmployeeDTO;
 import entities.dtos.RenameMeDTO;
 import entities.Customer;
@@ -43,12 +44,11 @@ public class EmployeeFacade {
             Employee e = em.find(Employee.class, id);
 
 
-            if (e != null){
+            if (e != null) {
 
 
                 return new EmployeeDTO(e);
-            }
-            else {
+            } else {
                 throw new WebApplicationException("employee doesnt exits!");
             }
 
@@ -133,6 +133,23 @@ public class EmployeeFacade {
 
             em.close();
         }
+    }
+
+    public List<CustomerDTO> getCustomersByEmployeeId(int id) {
+        EntityManager em = getEntityManager();
+        TypedQuery<Customer> query = em.createQuery("SELECT c FROM Customer c JOIN c.employees e WHERE e.id = :id", Customer.class);
+        query.setParameter("id", id);
+        List<CustomerDTO> customerDTOs = CustomerDTO.getCustomerDTOs(query.getResultList());
+        return customerDTOs;
+    }
+
+    public List<EmployeeDTO> getEmployeeByCustomerId(int id) {
+        EntityManager em = getEntityManager();
+        TypedQuery<Employee> query = em.createQuery("SELECT e FROM Employee e JOIN e.customers c WHERE c.id = :id", Employee.class);
+        query.setParameter("id", id);
+        List<EmployeeDTO> employeeDTOs = EmployeeDTO.getDTOList(query.getResultList());
+        return employeeDTOs;
+
     }
 
 
